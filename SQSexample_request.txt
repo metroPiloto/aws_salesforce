@@ -1,6 +1,17 @@
+CREATE QUEUE
+-----------------------------------------------------------------------------
 http://sqs.eu-east-1.amazonaws.com/   
 ?Action=CreateQueue
 &DefaultVisibilityTimeout=40
 &QueueName=MyQueue
 &Version=2012-11-05
+&AUTHPARAMS
+
+SEND MESSAGE
+-----------------------------------------------------------------------------
+http://sqs.us-east-1.amazonaws.com/123456789012/queue1
+?Action=SendMessage
+&MessageBody=Your%20Message%20Text
+&Version=2012-11-05
+&Expires=2011-10-15T12:00:00Z
 &AUTHPARAMS
