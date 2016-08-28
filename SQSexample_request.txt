@@ -1,0 +1,6 @@
+http://sqs.eu-east-1.amazonaws.com/   
+?Action=CreateQueue
+&DefaultVisibilityTimeout=40
+&QueueName=MyQueue
+&Version=2012-11-05
+&AUTHPARAMS
