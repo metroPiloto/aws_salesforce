@@ -57,13 +57,13 @@ public class aws_connectivity {
 
         String hashedCanonicalRequest = getSHA256HexDigest(canonicalRequest);
                 
-        String credentialScope = dateString.left(8) + '/' + region + '/' + service + '/' + 'aws4_request';
+        String credentialScope = dateString.left(10).remove('-') + '/' + region + '/' + service + '/' + 'aws4_request';
         String stringToSign = hashAlgorithmName + '\n' + dateString + '\n' + credentialScope + '\n' + hashedCanonicalRequest;
         
-        String signature = deriveSigningKey(awsConfigNameOrSecretKey, dateString.left(8), region, service, stringToSign);
+        String signature = deriveSigningKey(awsConfigNameOrSecretKey, dateString.left(10).remove('-'), region, service, stringToSign);
         
         //Create Authorization Header
-        String authorizationHeader = 'Authorization: ' + hashAlgorithmName + ' Credential=' + getAccessKeyID(awsConfigNameOrSecretKey) + '/' + credentialScope + ', SignedHeaders=' + signedHeaderStr + ', Signature=' + signature;
+        String authorizationHeader = hashAlgorithmName + ' Credential=' + getAccessKeyID(awsConfigNameOrSecretKey) + '/' + credentialScope + ', SignedHeaders=' + signedHeaderStr + ', Signature=' + signature;
         
         return authorizationHeader;
     }
