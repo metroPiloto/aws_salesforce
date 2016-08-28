@@ -147,7 +147,23 @@ public class aws_connectivity {
         params.put('MessageBody',encode(message));
         params.put('Version','20121105');
         
-        String request = createSignedAWSRequest(awsConfigNameOrSecretKey, 'GET', canonicalURI, host, service, region, message, headers, params);
-        System.debug(request);
+        String authHeader = createSignedAWSRequest(awsConfigNameOrSecretKey, 'GET', canonicalURI, host, service, region, message, headers, params);
+        
+        HttpRequest req = new HttpRequest();
+        req.setEndPoint(canonicalURI);
+        req.setMethod('GET');
+        req.setHeader('Authorization', authHeader);
+        Http http = new Http();
+        try {
+            //System.debug('Signed string: ' + toSign);
+            //System.debug('Url: ' + url);
+            HttpResponse res = http.send(req);
+            System.debug('Status: ' + res.getStatus());
+            System.debug('Code : ' + res.getStatusCode());
+            System.debug('Body : ' + res.getBody());
+        }
+            catch (System.CalloutException e) {
+            System.debug('ERROR: ' + e);
+        }
     }
 }
