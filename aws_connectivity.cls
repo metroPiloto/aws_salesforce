@@ -1,29 +1,29 @@
 public class aws_connectivity {
     private String hashAlgorithmName = 'AWS4-HMAC-SHA256';
     
-    private String getAccessKeyID(String awsConfigNameOrAccessKeyID) {
+    private String getAccessKeyID(String awsConfigNameOrSecretKey) {
         String accessKey;
             List<charterforce__AWS_Config__c> aws = [SELECT charterforce__accessKey__c,
                 charterforce__secretKey__c,
                 charterforce__host__c,
                 charterforce__queue__c
                 FROM charterforce__AWS_Config__c
-                WHERE name = :awsConfigNameOrAccessKeyID LIMIT 1];
+                WHERE name = :awsConfigNameOrSecretKey LIMIT 1];
             
             if (aws.size() > 0) {
                 accessKey = aws[0].charterforce__accessKey__c;        
             } else {
-                accessKey = awsConfigNameOrAccessKeyID;
+                accessKey = '';
             }
             return accessKey; 
     }
 
-    public String createSignedAWSRequest(String awsConfigNameOrSecretKey, String awsConfigNameOrAccessKeyID, String method, String canonicalURI, String host, String service, String region, String payload, Map<String,String> headers, Map<String,String> params, String dateString) {
+    public String createSignedAWSRequest(String awsConfigNameOrSecretKey, String method, String canonicalURI, String host, String service, String region, String payload, Map<String,String> headers, Map<String,String> params, String dateString) {
         if (canonicalURI != '/') {
             canonicalURI = '/' + encode(canonicalURI.removeStart('/'));
         }
         
-        String accessKeyID = getAccessKeyID(awsConfigNameOrAccessKeyID);
+        String accessKeyID = getAccessKeyID(awsConfigNameOrSecretKey);
         List<String> sortedHeaders = new List<String>();
         sortedHeaders.addAll(headers.keySet());
         sortedHeaders.sort();
@@ -63,13 +63,13 @@ public class aws_connectivity {
         String signature = deriveSigningKey(awsConfigNameOrSecretKey, dateString.left(8), region, service, stringToSign);
         
         //Create Authorization Header
-        String authorizationHeader = 'Authorization: ' + hashAlgorithmName + ' Credential=' + getAccessKeyID(awsConfigNameOrAccessKeyID) + '/' + credentialScope + ', SignedHeaders=' + signedHeaderStr + ', Signature=' + signature;
+        String authorizationHeader = 'Authorization: ' + hashAlgorithmName + ' Credential=' + getAccessKeyID(awsConfigNameOrSecretKey) + '/' + credentialScope + ', SignedHeaders=' + signedHeaderStr + ', Signature=' + signature;
         
         return authorizationHeader;
     }
 
-    public String createSignedAWSRequest(String awsConfigNameOrSecretKey, String awsConfigNameOrAccessKeyID, String method, String canonicalURI, String host, String service, String region, String payload, Map<String,String> headers, Map<String,String> params) {
-        String request = createSignedAWSRequest(awsConfigNameOrSecretKey, awsConfigNameOrAccessKeyID, method, canonicalURI, host, service, region, payload, headers, params, getCurrentDate());
+    public String createSignedAWSRequest(String awsConfigNameOrSecretKey, String method, String canonicalURI, String host, String service, String region, String payload, Map<String,String> headers, Map<String,String> params) {
+        String request = createSignedAWSRequest(awsConfigNameOrSecretKey, method, canonicalURI, host, service, region, payload, headers, params, getCurrentDate());
         return request;
     }
 
@@ -147,7 +147,7 @@ public class aws_connectivity {
         params.put('MessageBody',encode(message));
         params.put('Version','20121105');
         
-        String request = createSignedAWSRequest(awsConfigNameOrSecretKey, awsConfigNameOrSecretKey, 'GET', canonicalURI, host, service, region, message, headers, params);
+        String request = createSignedAWSRequest(awsConfigNameOrSecretKey, 'GET', canonicalURI, host, service, region, message, headers, params);
         System.debug(request);
     }
 }
