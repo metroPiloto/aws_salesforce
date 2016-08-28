@@ -1,20 +1,11 @@
 String method = 'GET';
-String host = 'example.amazonaws.com';
-String service = 'service';
+String host = 'sqs.us-east-1.amazonaws.com';
+String service = 'SQS';
 String region = 'us-east-1';
-String payload = '';
-String canonicalURI = '/';
-
-Map<String,String> headers = new Map<String,String>();
-headers.put('host', host);
-headers.put('x-amz-date', '20150830T123600Z');
-
-Map<String,String> params = new Map<String,String>();
-params.put('Param1','value1');
-params.put('Param2','value2');
+String payload = 'Hello World';
+String canonicalURI = 'https://sqs.us-east-1.amazonaws.com/043054576008/ls_salesforce_to_charterconnection';
 
 aws_connectivity aws = new aws_connectivity();
-//String request = aws.createSignedAWSRequest('wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY', 'AKIDEXAMPLE', method, canonicalURI, host, service, region, payload, headers, params, '20150830T123600Z');
-//system.debug(request);
-aws.sendSQSMessage('salesforce2charterConnection','https://sqs.us-east-1.amazonaws.com/043054576008/ls_salesforce_to_charterconnection','sqs.us-east-1.amazonaws.com','SQS','us-east-1','Hello World'); 
+String request = aws.sendSQSMessage('salesforce2charterConnection', canonicalURI, host, service, region, payload);
+system.debug(request);
 
